@@ -70,6 +70,7 @@ parts:
       - libgl1-mesa-dev
     stage-packages:
       - libtinfo6
+      - libncursesw6
       - libfontconfig1
       - libfreetype6
       - libpng16-16
