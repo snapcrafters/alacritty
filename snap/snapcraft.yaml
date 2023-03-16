@@ -1,7 +1,7 @@
 name: alacritty
 adopt-info: alacritty
 
-base: core20
+base: core22
 grade: stable
 confinement: classic
 compression: lzo    # should make startup nearly as fast as regular executables
@@ -17,7 +17,11 @@ apps:
     desktop: usr/share/applications/Alacritty.desktop
     environment:
       LC_ALL: C.UTF-8
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/lib/$SNAPCRAFT_ARCH_TRIPLET"
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET:$SNAP/lib/$CRAFT_ARCH_TRIPLET"
+
+layout:
+  /usr/lib/x86_64-linux-gnu/dri:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
 
 parts:
   desktop-glib-only:
@@ -51,9 +55,9 @@ parts:
   alacritty:
     plugin: rust
     source: https://github.com/alacritty/alacritty.git
-    source-tag: v0.10.1
+    source-tag: v0.11.0
     parse-info:
-      - extra/linux/io.alacritty.Alacritty.appdata.xml
+      - extra/linux/org.alacritty.Alacritty.appdata.xml
     rust-path:
       - alacritty
     build-packages:
@@ -68,6 +72,7 @@ parts:
       - libxcb-shape0-dev
       - libxcb1-dev
       - libgl1-mesa-dev
+      - cargo
     stage-packages:
       - libtinfo6
       - libncursesw6
@@ -89,16 +94,16 @@ parts:
     override-build: |
       version=$(git describe --match "v*" | cut -c2-)
 
-      snapcraftctl set-version $version
-      snapcraftctl build
+      craftctl set version=$version
+      craftctl default
 
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications \
-          $SNAPCRAFT_PART_INSTALL/usr/share/icons \
-          $SNAPCRAFT_PART_INSTALL/usr/share/bash-completion/completions
+      mkdir -p $CRAFT_PART_INSTALL/usr/share/applications \
+          $CRAFT_PART_INSTALL/usr/share/icons \
+          $CRAFT_PART_INSTALL/usr/share/bash-completion/completions
 
-      cp extra/linux/Alacritty.desktop $SNAPCRAFT_PART_INSTALL/usr/share/applications/Alacritty.desktop
-      cp extra/logo/compat/alacritty-term+scanlines.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/Alacritty.png
-      cp extra/completions/alacritty.bash $SNAPCRAFT_PART_INSTALL/usr/share/bash-completion/completions/alacritty
+      cp extra/linux/Alacritty.desktop $CRAFT_PART_INSTALL/usr/share/applications/Alacritty.desktop
+      cp extra/logo/compat/alacritty-term+scanlines.png $CRAFT_PART_INSTALL/usr/share/icons/Alacritty.png
+      cp extra/completions/alacritty.bash $CRAFT_PART_INSTALL/usr/share/bash-completion/completions/alacritty
 
       sed -i 's|Icon=.*|Icon=${SNAP}/usr/share/icons/Alacritty.png|g' \
-          $SNAPCRAFT_PART_INSTALL/usr/share/applications/Alacritty.desktop
+          $CRAFT_PART_INSTALL/usr/share/applications/Alacritty.desktop
