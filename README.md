@@ -35,6 +35,8 @@ distributions.</p>
 
 ([Don't have snapd installed?](https://snapcraft.io/docs/core/install))
 
+The snap requires glibc version 2.33 or higher to be installed. For Ubuntu, this means Ubuntu 22.04 LTS or newer.
+
 | [![Alper Kanat](https://gravatar.com/avatar/ef468cdb9947165b09d2afae24d6491c/?s=128)](https://github.com/tunix/) |
 | :---: |
 | [Alper Kanat](https://github.com/tunix/) |
