@@ -1,10 +1,26 @@
 name: alacritty
-adopt-info: alacritty
+version: 0.13.1
+summary: A cross-platform, GPU enhanced terminal emulator.
+description: |
+  Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for
+  extensive configuration. By integrating with other applications, rather than reimplementing their
+  functionality, it manages to provide a flexible set of features with high performance
+
+  **Authors**
+
+  This snap is maintained by the Snapcrafters community, and is not necessarily endorsed or
+  officially maintained by the upstream developers.
+
+icon: snap/alacritty.png
+website: https://alacritty.org
+contact: https://github.com//snapcrafters/alacritty/issues
+issues: https://github.com//snapcrafters/alacritty/issues
+source-code: https://github.com/alacritty/discord
 
 base: core22
 grade: stable
 confinement: classic
-compression: lzo    # should make startup nearly as fast as regular executables
+compression: lzo
 
 apps:
   alacritty:
@@ -55,7 +71,7 @@ parts:
   alacritty:
     plugin: rust
     source: https://github.com/alacritty/alacritty.git
-    source-tag: v0.13.1
+    source-tag: v$SNAPCRAFT_PROJECT_VERSION
     parse-info:
       - extra/linux/org.alacritty.Alacritty.appdata.xml
     rust-path:
@@ -92,9 +108,6 @@ parts:
       - libxkbcommon0
       - libnss-sss
     override-build: |
-      version=$(git describe --match "v*" | cut -c2-)
-
-      craftctl set version=$version
       craftctl default
 
       mkdir -p $CRAFT_PART_INSTALL/usr/share/applications \
