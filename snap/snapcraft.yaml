@@ -82,6 +82,8 @@ parts:
       - extra/linux/org.alacritty.Alacritty.appdata.xml
     rust-path:
       - alacritty
+    build-attributes:
+      - enable-patchelf
     build-packages:
       - cmake
       - pkg-config
