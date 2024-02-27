@@ -29,6 +29,11 @@ architectures:
   - build-on: s390x
   - build-on: ppc64el
 
+lint:
+  ignore:
+    - classic:
+      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/dri/*.so
+
 apps:
   alacritty:
     command: bin/alacritty
@@ -50,6 +55,8 @@ parts:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-subdir: glib-only
     plugin: make
+    build-attributes:
+      - enable-patchelf
     build-packages:
       - libglib2.0-dev
     stage-packages:
@@ -66,7 +73,21 @@ parts:
       - libegl1-mesa
       - libglx-mesa0
     build-attributes:
+      - enable-patchelf
+    stage:
+      # The libraries in .../dri need no-patchelf, so they come from the mesa-unpatched part
+      - -usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+
+  mesa-gl1-dri:
+    plugin: nil
+    stage-packages:
+      - libgl1-mesa-dri
+    build-attributes:
       - no-patchelf
+    stage:
+      # Only the libraries in .../dri need to not be patched, the rest come from the mesa part
+      # Otherwise snapcraft may strip the build ID and cause the driver to crash
+      - usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
 
   custom-wrapper:
     plugin: dump
