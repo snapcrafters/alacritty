@@ -29,11 +29,6 @@ architectures:
   - build-on: s390x
   - build-on: ppc64el
 
-lint:
-  ignore:
-    - classic:
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/dri/*.so
-
 apps:
   alacritty:
     command: bin/alacritty
