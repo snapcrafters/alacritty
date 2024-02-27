@@ -40,7 +40,6 @@ apps:
     desktop: usr/share/applications/Alacritty.desktop
     environment:
       LC_ALL: C.UTF-8
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET:$SNAP/lib/$CRAFT_ARCH_TRIPLET"
 
 layout:
   /usr/lib/x86_64-linux-gnu/dri:
@@ -83,6 +82,8 @@ parts:
       - extra/linux/org.alacritty.Alacritty.appdata.xml
     rust-path:
       - alacritty
+    build-attributes:
+      - enable-patchelf
     build-packages:
       - cmake
       - pkg-config
