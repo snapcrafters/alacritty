@@ -41,10 +41,6 @@ apps:
     environment:
       LC_ALL: C.UTF-8
 
-layout:
-  /usr/lib/x86_64-linux-gnu/dri:
-    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
-
 parts:
   desktop-glib-only:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
