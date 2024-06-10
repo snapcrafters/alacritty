@@ -127,6 +127,7 @@ parts:
       - libffi7
       - libxkbcommon0
       - libnss-sss
+      - libwayland-egl1
     override-build: |
       craftctl default
 
