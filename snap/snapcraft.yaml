@@ -40,6 +40,11 @@ apps:
     desktop: usr/share/applications/Alacritty.desktop
     environment:
       LC_ALL: C.UTF-8
+    plugs:
+      - desktop
+      - gsettings
+      - wayland
+      - x11
 
 parts:
   desktop-glib-only:
