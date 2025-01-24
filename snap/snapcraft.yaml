@@ -1,5 +1,5 @@
 name: alacritty
-version: 0.14.0
+version: 0.15.0
 summary: A cross-platform, GPU enhanced terminal emulator.
 description: |
   Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for
