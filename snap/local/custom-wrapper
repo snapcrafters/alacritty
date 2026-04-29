@@ -2,5 +2,7 @@
 
 export XDG_CONFIG_HOME="$SNAP_REAL_HOME/.config"
 export XDG_DATA_HOME="$SNAP_REAL_HOME/.local/share"
+# Fix for the wrong cursor loaded opening X11 apps from alacritty terminal
+export XCURSOR_PATH="/usr/share/icons"
 
 exec "$@"
