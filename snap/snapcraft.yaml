@@ -126,6 +126,7 @@ parts:
       - libxrandr2
       - libffi7
       - libxkbcommon0
+      - libxkbcommon-x11-0
       - libnss-sss
       - libwayland-egl1
     override-build: |
