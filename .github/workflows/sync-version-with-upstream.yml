@@ -22,8 +22,56 @@ jobs:
         with:
           token: ${{ secrets.SNAPCRAFTERS_BOT_COMMIT }}
           update-script: |
-            VERSION=$(
-              curl -sL https://api.github.com/repos/alacritty/alacritty/releases | 
-              jq .  | grep tag_name | grep -vE "beta|rc" | head -n 1 | cut -d'"' -f4 | tr -d 'v'
-            )
-            sed -i 's/^\(version: \).*$/\1'"$VERSION"'/' snap/snapcraft.yaml
+            set -euo pipefail
+
+            : "${UPSTREAM_RELEASES_URL:=https://github.com/alacritty/alacritty/releases/latest}"
+            : "${EXPECTED_RELEASE_PREFIX:=https://github.com/alacritty/alacritty/releases/tag/}"
+            : "${MANIFEST:=snap/snapcraft.yaml}"
+            VERSION_PATTERN='^[0-9]+([.][0-9A-Za-z]+)*([-+~][0-9A-Za-z.-]+)?$'
+
+            RELEASE_URL=$(curl -fsSL -o /dev/null -w '%{url_effective}' "$UPSTREAM_RELEASES_URL")
+            [[ "$RELEASE_URL" == "$EXPECTED_RELEASE_PREFIX"* ]] || {
+              printf 'unexpected upstream release URL: %q\n' "$RELEASE_URL" >&2
+              exit 1
+            }
+
+            RAW_VERSION=${RELEASE_URL#"$EXPECTED_RELEASE_PREFIX"}
+            VERSION=${RAW_VERSION#v}
+            [[ ${#VERSION} -ge 1 && ${#VERSION} -le 128 && "$VERSION" =~ $VERSION_PATTERN ]] || {
+              printf 'unsafe or empty upstream version: %q\n' "$VERSION" >&2
+              exit 1
+            }
+
+            VERSION_COUNT=$(grep -cE '^version:[[:space:]]*' "$MANIFEST" || true)
+            [[ "$VERSION_COUNT" -eq 1 ]] || {
+              echo 'expected exactly one version field' >&2
+              exit 1
+            }
+
+            OLD_VERSION=$(yq -r '.version' "$MANIFEST")
+            [[ ${#OLD_VERSION} -ge 1 && ${#OLD_VERSION} -le 128 && "$OLD_VERSION" =~ $VERSION_PATTERN ]] || {
+              echo 'existing version is absent or unsafe' >&2
+              exit 1
+            }
+
+            if [[ "$VERSION" == "$OLD_VERSION" ]]; then
+              echo "upstream version is unchanged: $VERSION"
+              exit 0
+            fi
+
+            CANDIDATE=$(mktemp "${MANIFEST}.sync-version.XXXXXX")
+            trap 'rm -f -- "$CANDIDATE"' EXIT
+            sed -E 's|^version:[[:space:]]*.*$|version: '"$VERSION"'|' "$MANIFEST" > "$CANDIDATE"
+            chmod --reference="$MANIFEST" "$CANDIDATE"
+
+            [[ $(grep -cE '^version:[[:space:]]*' "$CANDIDATE") -eq 1 ]] || {
+              echo 'version field count changed' >&2
+              exit 1
+            }
+            grep -Fxq "version: $VERSION" "$CANDIDATE" || {
+              echo 'new version is not exact' >&2
+              exit 1
+            }
+
+            mv -- "$CANDIDATE" "$MANIFEST"
+            trap - EXIT
