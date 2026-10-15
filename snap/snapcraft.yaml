@@ -17,17 +17,17 @@ contact: https://github.com//snapcrafters/alacritty/issues
 issues: https://github.com//snapcrafters/alacritty/issues
 source-code: https://github.com/alacritty/discord
 
-base: core22
+base: core24
 grade: stable
 confinement: classic
 compression: lzo
 
-architectures:
-  - build-on: amd64
-  - build-on: armhf
-  - build-on: arm64
-  - build-on: s390x
-  - build-on: ppc64el
+platforms:
+  amd64:
+  armhf:
+  arm64:
+  s390x:
+  ppc64el:
 
 apps:
   alacritty:
@@ -58,16 +58,16 @@ parts:
     stage-packages:
       - libglu1-mesa
       - libgl1-mesa-dri
-      - libgl1-mesa-glx
+      - libgl1
       - libegl-mesa0
       - libegl1
-      - libegl1-mesa
       - libglx-mesa0
     build-attributes:
       - enable-patchelf
     stage:
-      # The libraries in .../dri need no-patchelf, so they come from the mesa-unpatched part
-      - -usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      # Preserve the DRI drivers and their shared Gallium implementation below.
+      - -usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/dri
+      - -usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/libgallium-*.so
 
   mesa-gl1-dri:
     plugin: nil
@@ -76,9 +76,9 @@ parts:
     build-attributes:
       - no-patchelf
     stage:
-      # Only the libraries in .../dri need to not be patched, the rest come from the mesa part
-      # Otherwise snapcraft may strip the build ID and cause the driver to crash
-      - usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      # Keep DRI and Gallium unpatched, as rewriting their ELF layout can crash Mesa.
+      - usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/dri
+      - usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/libgallium-*.so
 
   custom-wrapper:
     plugin: dump
@@ -114,7 +114,7 @@ parts:
       - libncursesw6
       - libfontconfig1
       - libfreetype6
-      - libpng16-16
+      - libpng16-16t64
       - libxau6
       - libxcursor1
       - libxcb-render0
@@ -124,7 +124,7 @@ parts:
       - libxdmcp6
       - libxi6
       - libxrandr2
-      - libffi7
+      - libffi8
       - libxkbcommon0
       - libxkbcommon-x11-0
       - libnss-sss
